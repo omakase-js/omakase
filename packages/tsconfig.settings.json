@@ -1,0 +1,20 @@
+{
+    // To understand how this works:
+    // https://github.com/RyanCavanaugh/learn-a
+    //
+    "compilerOptions": {
+        "composite": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+
+        "target": "es6",
+        "module": "commonjs",
+        "rootDir": "src",
+        "outDir": "build",
+        "allowJs": false,
+        "pretty": true,
+        "strict": true,
+    },
+    "lib":["es2017"],
+}

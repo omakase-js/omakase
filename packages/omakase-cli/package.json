@@ -1,0 +1,15 @@
+{
+  "name": "@artsy/omakase-cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "build/index.js",
+  "author": "Orta Therox <orta.therox@gmail.com> & Art.sy Inc",
+  "license": "MIT",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build": "tsc",
+    "lint": "tslint 'src/**/*.{ts,tsx}'",
+    "release": "release-it",
+    "test": "jest"
+  }
+}

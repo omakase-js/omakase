@@ -1,0 +1,4 @@
+// This allows using `yarn jest` from the root of the project
+{
+  "extends": "./packages/tsconfig.settings.json",
+}

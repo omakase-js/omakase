@@ -10,4 +10,5 @@ cache:
 script:
 - yarn lint
 - yarn build
-- yarn test
+- ls packages/cli/src/commands/_tests
+- yarn jest

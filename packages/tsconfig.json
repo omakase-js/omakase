@@ -1,6 +1,7 @@
 {
-  "files": [],
-  "references": [
-      { "path": "cli" },
-  ]
+    "files": [],
+    "references": [
+        { "path": "cli" },
+    ]
 }
+  

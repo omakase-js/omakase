@@ -1,7 +1,10 @@
 {
   "name": "@omakase/cli",
   "version": "0.0.1",
-  "description": "",
+  "description": "The Omakase JS CLI",
+  "bin": {
+    "om": "./bin/run"
+  },
   "main": "build/index.js",
   "author": "Orta Therox <orta.therox@gmail.com> & Art.sy Inc",
   "license": "MIT",
@@ -10,6 +13,25 @@
     "build": "tsc",
     "lint": "tslint 'src/**/*.{ts,tsx}'",
     "release": "release-it",
-    "test": "jest"
+    "test": "jest",
+    "postpack": "rm -f oclif.manifest.json",
+    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme"
+  },
+  "oclif": {
+    "commands": "./build/commands",
+    "bin": "om"
+  },
+  "files": [
+    "/bin",
+    "/build",
+    "/oclif.manifest.json"
+  ],
+  "dependencies": {
+    "@oclif/command": "^1",
+    "@oclif/config": "^1",
+    "tslib": "^1"
+  }, 
+  "devDependencies": {
+    "@oclif/dev-cli": "^1"
   }
 }

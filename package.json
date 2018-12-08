@@ -5,8 +5,6 @@
     "packages/*"
   ],
   "scripts": {
-    "compile": "lerna run compile",
-    "clean": "lerna run clean",
     "build": "lerna run build",
     "lint": "lerna run lint",
     "test": "lerna run test",

@@ -1,6 +1,6 @@
 # Omakase
 
-A JS Stack composed by the folks at Artsy.
+A JS Stack curated by the folks at Artsy.
 
 ---
 

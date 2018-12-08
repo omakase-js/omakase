@@ -1,6 +1,5 @@
 @artsy/omakase
 
-WIP right now. Rough idea:
 
 - There is an omakase cli tool for template files like a new QueryRenderer etc
 - There is a react-scripts fork

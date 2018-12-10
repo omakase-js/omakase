@@ -1,6 +1,6 @@
 import { Command, flags as f } from "@oclif/command"
 import * as yeoman from "yeoman-environment"
-import { ComponentGenerator } from "./generator/Example"
+import { ComponentGenerator } from "../generator/Example"
 
 export default class Generate extends Command {
   static description = "templates for your react component"
@@ -12,7 +12,7 @@ hello world from ./src/hello.ts!
   ]
 
   static flags = {
-    help: f.help({ char: "h" }),
+    classBased: f.boolean({ char: "h" }),
     // flag with a value (-n, --name=VALUE)
     name: f.string({ char: "n", description: "name to print" }),
     // flag with no value (-f, --force)
@@ -42,3 +42,5 @@ hello world from ./src/hello.ts!
     // })
   }
 }
+
+export type Args = typeof Generate["flags"]

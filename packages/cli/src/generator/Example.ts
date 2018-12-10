@@ -1,5 +1,7 @@
 import * as Generator from "yeoman-generator"
 
+import { Args } from "../commands/generate"
+
 export class ComponentGenerator extends Generator {
   constructor(args: any, opts: any) {
     super(args, opts)
@@ -13,6 +15,8 @@ export class ComponentGenerator extends Generator {
 
   writing() {
     // NOOP
+    const args = this.args as Args
+
     console.log("Hiiiii")
   }
 }

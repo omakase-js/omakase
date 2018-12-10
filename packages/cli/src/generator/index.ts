@@ -1,4 +1,4 @@
-const Generator = require("yeoman-generator")
+import * as Generator from "yeoman-generator"
 
 class ComponentGenerator extends Generator {
   constructor(args: any, opts: any) {
@@ -58,4 +58,5 @@ class ComponentGenerator extends Generator {
   }
 }
 
-module.exports = ComponentGenerator
+// This is because the yeoman-test package expects an export like `module.exports = ComponentGenerator`
+export = ComponentGenerator

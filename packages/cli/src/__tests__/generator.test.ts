@@ -21,6 +21,8 @@ function compileGenerator() {
         path.resolve(__dirname, "../../../../node_modules/.bin/tsc"),
         "--target",
         "es6",
+        "--module",
+        "commonjs",
         path.join(__dirname, "../generator/index.ts"),
       ],
       { env: process.env },
@@ -31,7 +33,6 @@ function compileGenerator() {
 }
 
 async function generate(component: string, options = {}) {
-  compileGenerator()
   await runGenerator(path.join(__dirname, "../generator"))
     .withOptions(options)
     .withArguments([component])
@@ -43,6 +44,7 @@ describe("component generator", () => {
   let sourceFile: SourceFile
 
   beforeAll(() => {
+    compileGenerator()
     expect.hasAssertions()
   })
 

@@ -1,6 +1,6 @@
 import { Command, flags as f } from "@oclif/command"
 import * as yeoman from "yeoman-environment"
-import { ComponentGenerator } from "./generator/Example"
+import { ComponentGenerator } from "../generator"
 
 export default class Generate extends Command {
   static description = "templates for your react component"

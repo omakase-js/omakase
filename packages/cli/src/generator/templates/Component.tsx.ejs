@@ -1,0 +1,96 @@
+import React from "react"
+<% if (GraphQLTypeName) { -%>
+import { create<%= relayContainerType %>, graphql } from "react-relay"
+import { <%= relayTypeName %> } from "__generated__/<%= relayTypeName %>.graphql"
+<% } -%>
+
+export interface <%= ComponentName %>Props {
+<% if (relayPropName) { -%>
+  <%= relayPropName %>: <%= relayTypeName %>
+<% } -%>
+}
+
+<% if (classBased) { -%>
+export class <%= ComponentName %> extends React.Component<<%= ComponentName %>Props> {
+  render() {
+    return null
+  }
+}
+<% } else { -%>
+export const <%= ComponentName %>: React.SFC<<%= ComponentName %>Props> = props => {
+  return null
+}
+<% } -%>
+
+<% if (GraphQLTypeName) { -%>
+export const <%= ComponentName %><%= relayContainerType %> = create<%= relayContainerType %>(
+  <%= ComponentName %>,
+  graphql`
+    fragment <%= relayTypeName %> on <%= GraphQLTypeName %><%- paginationContainer ? " @argumentDefinitions(count: { type: \"Int\", defaultValue: 10 }, cursor: { type: \"String\", defaultValue: \"\" })" : "" %> {
+<% if (refetchContainer || paginationContainer) { -%>
+      # Most, but not all, types have this field. If needed, replace it with a
+      # different identifier field and be sure to adjust the query below
+      # accordingly. (Also be sure to remove this comment.)
+      __id
+<% if (paginationContainer) { -%>
+      <%= paginationFieldName %>(first: $count, after: $cursor) @connection(key: "<%= ComponentName %>_<%= paginationFieldName %>") {
+        pageInfo {
+          hasNextPage
+        }
+        edges {
+          node {
+          }
+        }
+      }
+<% } -%>
+    }
+  `,
+<% if (refetchContainer) { -%>
+  graphql`
+    query <%= ComponentName %>RefetchQuery($nodeID: ID!) {
+      node(__id: $nodeID) {
+        ...<%= relayTypeName %>
+      }
+    }
+  `
+<% } else { -%>
+  {
+    direction: "forward",
+    getConnectionFromProps(props) {
+      return props.<%= relayPropName %>.<%= paginationFieldName %>
+    },
+    getFragmentVariables(prevVars, totalCount) {
+      return {
+        ...prevVars,
+        count: totalCount,
+      }
+    },
+    getVariables(props, { count, cursor }, fragmentVariables) {
+      return {
+        // in most cases, for variables other than connection filters like
+        // `first`, `after`, etc. you may want to use the previous values.
+        ...fragmentVariables,
+        count,
+        cursor,
+        nodeID: props.<%= relayPropName %>.__id,
+      }
+    },
+    query: graphql`
+      query <%= ComponentName %>PaginationQuery(
+        $nodeID: ID!
+        $count: Int!
+        $cursor: String
+      ) {
+        node(__id: $nodeID) {
+          ...<%= relayTypeName %> @arguments(count: $count, cursor: $cursor)
+        }
+      }
+    `,
+  }
+<% } -%>
+<% } else { -%>
+    }
+  `
+<% } -%>
+)
+<% } -%>

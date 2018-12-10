@@ -34,12 +34,25 @@ function compileGenerator() {
   return path.join(__dirname, "../generator/index.js")
 }
 
-async function generate(component: string, options = {}) {
-  await runGenerator(path.join(__dirname, "../generator"))
+function generate(component: string, options = {}) {
+  const context = runGenerator(path.join(__dirname, "../generator"))
     .withOptions(options)
     .withArguments([component])
-  const project = new Project({})
-  return project.addExistingSourceFile(component + ".tsx")
+
+  let error: Error
+  context.on("ready", (generator: any) => {
+    generator.env.on("error", (err: Error) => {
+      error = err
+    })
+  })
+
+  return context.then(() => {
+    if (error) {
+      throw error
+    }
+    const project = new Project({})
+    return project.addExistingSourceFile(component + ".tsx")
+  })
 }
 
 describe("component generator", () => {
@@ -212,6 +225,16 @@ describe("component generator", () => {
         sourceFile = await generate("ArtworkBrickMetadata", {
           paginationContainer: "Artwork.relatedArtworks",
         })
+      })
+
+      it("fails if no paginated field is given", async () => {
+        try {
+          await generate("ArtworkBrickMetadata", {
+            paginationContainer: "Artwork",
+          })
+        } catch (e) {
+          expect(e.message).toMatch(/GraphQLType\.field/)
+        }
       })
 
       sharedTests("PaginationContainer", createContainerCallExpression => {

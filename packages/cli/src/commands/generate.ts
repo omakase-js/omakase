@@ -39,6 +39,10 @@ export default class Generate extends Command {
     const { args, flags } = this.parse(Generate)
     const env = yeoman.createEnv()
 
+    env.on("error", (err: Error) => {
+      this.error(err.message)
+    })
+
     env
       .instantiate(ComponentGenerator, {
         options: flags,

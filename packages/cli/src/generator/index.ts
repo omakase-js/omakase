@@ -12,6 +12,19 @@ class ComponentGenerator extends Generator {
     this.option("paginationContainer", { type: String })
   }
 
+  initializing() {
+    if (
+      this.options.paginationContainer &&
+      !this.options.paginationContainer.includes(".")
+    ) {
+      this.env.error(
+        new Error(
+          "The `paginationContainer' option expects a value formatted like GraphQLType.field",
+        ),
+      )
+    }
+  }
+
   writing() {
     const {
       Component,

@@ -1,3 +1,4 @@
+import * as path from "path"
 import * as Generator from "yeoman-generator"
 
 class ComponentGenerator extends Generator {
@@ -38,6 +39,9 @@ class ComponentGenerator extends Generator {
         : refetchContainer
           ? "RefetchContainer"
           : "PaginationContainer"
+
+    // FIXME: For some unknown reason the sourceRoot is wrong when run from the CLI
+    this.sourceRoot(path.join(__dirname, "templates"))
 
     this.fs.copyTpl(
       this.templatePath("Component.tsx.ejs"),

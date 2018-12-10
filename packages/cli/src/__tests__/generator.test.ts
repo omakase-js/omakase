@@ -1,5 +1,6 @@
 import { execFileSync, execSync } from "child_process"
 import * as dedent from "dedent"
+import * as fs from "fs"
 import * as path from "path"
 import {
   BodyableNodeStructure,
@@ -30,6 +31,7 @@ function compileGenerator() {
   } catch (_) {
     // no-op, the error thrown is type errors, which we don’t care about here.
   }
+  return path.join(__dirname, "../generator/index.js")
 }
 
 async function generate(component: string, options = {}) {
@@ -41,11 +43,16 @@ async function generate(component: string, options = {}) {
 }
 
 describe("component generator", () => {
+  let compiledGenerator: string
   let sourceFile: SourceFile
 
   beforeAll(() => {
-    compileGenerator()
+    compiledGenerator = compileGenerator()
     expect.hasAssertions()
+  })
+
+  afterAll(() => {
+    fs.unlinkSync(compiledGenerator)
   })
 
   describe("concerning purely a React component", () => {

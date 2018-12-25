@@ -1,17 +1,22 @@
-import { execFileSync, execSync } from "child_process"
+import { execFileSync } from "child_process"
 import * as dedent from "dedent"
 import * as fs from "fs"
 import * as path from "path"
 import {
+  ArrowFunction,
   BodyableNodeStructure,
   CallExpression,
+  ExpressionStatement,
+  JsxSelfClosingElement,
   MethodDeclaration,
   ObjectLiteralExpression,
   Project,
   PropertyAssignment,
   SourceFile,
   StringLiteral,
+  VariableStatement,
 } from "ts-simple-ast"
+import * as ts from "typescript"
 import { run as runGenerator } from "yeoman-test"
 
 function compileGenerator() {
@@ -51,13 +56,18 @@ function generate(component: string, options = {}) {
       throw error
     }
     const project = new Project({})
-    return project.addExistingSourceFile(component + ".tsx")
+    const sourceFile = project.addExistingSourceFile(`${component}.tsx`)
+    const testFile = project.addExistingSourceFile(
+      `__tests__/${component}.test.tsx`,
+    )
+    return { sourceFile, testFile }
   })
 }
 
 describe("component generator", () => {
   let compiledGenerator: string
   let sourceFile: SourceFile
+  let testFile: SourceFile
 
   beforeAll(() => {
     compiledGenerator = compileGenerator()
@@ -70,7 +80,7 @@ describe("component generator", () => {
 
   describe("concerning purely a React component", () => {
     beforeAll(async () => {
-      sourceFile = await generate("ArtworkBrickMetadata")
+      ;({ sourceFile, testFile } = await generate("ArtworkBrickMetadata"))
     })
 
     it("imports only react", () => {
@@ -101,9 +111,9 @@ describe("component generator", () => {
     })
 
     it("exports a class based component on request", async () => {
-      sourceFile = await generate("ArtworkBrickMetadata", {
+      ;({ sourceFile } = await generate("ArtworkBrickMetadata", {
         classBased: true,
-      })
+      }))
       const component = sourceFile.getClassOrThrow("ArtworkBrickMetadata")
       expect(
         sourceFile.getExportedDeclarations().includes(component),
@@ -111,6 +121,52 @@ describe("component generator", () => {
       expect(component.getExtendsOrThrow().getText()).toEqual(
         "React.Component<ArtworkBrickMetadataProps>",
       )
+    })
+
+    describe("concerning the corresponding test file", () => {
+      let describeExpression: CallExpression
+
+      beforeAll(() => {
+        describeExpression = (testFile
+          .getFirstChildOrThrow()
+          .getLastChildOrThrow() as ExpressionStatement).getExpression() as CallExpression
+      })
+
+      it("imports the implementation file", () => {
+        expect(
+          testFile
+            .getImportDeclarationOrThrow("../ArtworkBrickMetadata")
+            .getNamedImports()
+            .map(ni => ni.getText()),
+        ).toEqual(["ArtworkBrickMetadata"])
+      })
+
+      it("is named after the component", () => {
+        expect(describeExpression.getExpression().getText()).toEqual("describe")
+        expect(
+          (describeExpression.getArguments()[0] as StringLiteral).getLiteralText(),
+        ).toEqual("ArtworkBrickMetadata")
+      })
+
+      it("has a failing example test", () => {
+        const itExpression = ((describeExpression.getArguments()[1] as ArrowFunction)
+          .getBody()
+          .getChildSyntaxListOrThrow()
+          .getFirstChildOrThrow() as ExpressionStatement).getExpression() as CallExpression
+        const mountExpression = ((itExpression.getArguments()[1] as ArrowFunction)
+          .getBody()
+          .getChildSyntaxListOrThrow()
+          .getFirstChildOrThrow() as VariableStatement)
+          .getDeclarations()[0]
+          .getInitializerOrThrow() as CallExpression
+
+        expect(mountExpression.getExpression().getText()).toEqual("mount")
+        expect(
+          (mountExpression.getArguments()[0] as JsxSelfClosingElement)
+            .getTagNameNode()
+            .getText(),
+        ).toEqual("ArtworkBrickMetadata")
+      })
     })
   })
 
@@ -167,9 +223,9 @@ describe("component generator", () => {
 
     describe("fragment containers", () => {
       beforeAll(async () => {
-        sourceFile = await generate("ArtworkBrickMetadata", {
+        ;({ sourceFile } = await generate("ArtworkBrickMetadata", {
           fragmentContainer: "Artwork",
-        })
+        }))
       })
 
       sharedTests("FragmentContainer", createContainerCallExpression => {
@@ -187,9 +243,9 @@ describe("component generator", () => {
 
     describe("refetch containers", () => {
       beforeAll(async () => {
-        sourceFile = await generate("ArtworkBrickMetadata", {
+        ;({ sourceFile } = await generate("ArtworkBrickMetadata", {
           refetchContainer: "Artwork",
-        })
+        }))
       })
 
       sharedTests("RefetchContainer", createContainerCallExpression => {
@@ -222,9 +278,9 @@ describe("component generator", () => {
 
     describe("pagination containers", () => {
       beforeAll(async () => {
-        sourceFile = await generate("ArtworkBrickMetadata", {
+        ;({ sourceFile } = await generate("ArtworkBrickMetadata", {
           paginationContainer: "Artwork.relatedArtworks",
-        })
+        }))
       })
 
       it("fails if no paginated field is given", async () => {

@@ -72,6 +72,13 @@ class ComponentGenerator extends Generator {
         paginationFieldName,
       },
     )
+    this.fs.copyTpl(
+      this.templatePath("Component.test.tsx.ejs"),
+      this.destinationPath(`__tests__/${Component}.test.tsx`),
+      {
+        ComponentName,
+      },
+    )
   }
 }
 

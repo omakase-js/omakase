@@ -1,0 +1,9 @@
+import { <%= ComponentName %> } from "../<%= ComponentName %>"
+import { mount } from "enzyme"
+
+describe("<%= ComponentName %>", () => {
+  it("renders", () => {
+    const wrapper = mount(<<%= ComponentName %> />)
+    expect(wrapper.getElement()).not.toEqual(null)
+  })
+})

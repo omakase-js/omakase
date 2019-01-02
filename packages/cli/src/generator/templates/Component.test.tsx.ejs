@@ -1,0 +1,40 @@
+import { mount } from "enzyme"
+import React from "react"
+<% if (relayContainerName) { -%>
+import { graphql } from "react-relay"
+import { MockBoot, renderRelayTree } from "DevTools"
+import { <%= relayContainerName %> as <%= componentName %> } from "../<%= componentName %>"
+
+jest.unmock("react-relay")
+<% } else { -%>
+import { <%= componentName %> } from "../<%= componentName %>"
+<% } -%>
+
+describe("<%= componentName %>", () => {
+  it("renders", <%= relayContainerName && "async " %>() => {
+<% if (relayContainerName) { -%>
+    const wrapper = await renderRelayTree({
+      Component: <%= componentName %>,
+      query: graphql`
+        # TODO: Add parameters or nest the fragment spread inside a root field, as necessary.
+        query <%= componentName %>_Test_Query {
+          ...<%= relayTypeName %>
+        }
+      `,
+      mockResolvers: {},
+      variables: {},
+      wrapper: children => (
+        <MockBoot breakpoint="lg">{children}</MockBoot>
+      ),
+    })
+<% } else { -%>
+    const wrapper = mount(<<%= componentName %> />)
+<% } -%>
+    expect(
+      wrapper
+        .find("<%= componentName %>")
+        .children()
+        .getElements().length
+    ).not.toEqual(0)
+  })
+})

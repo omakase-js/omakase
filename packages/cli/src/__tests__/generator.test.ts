@@ -97,6 +97,14 @@ describe("component generator", () => {
     fs.unlinkSync(compiledGenerator)
   })
 
+  it("generates the component and test at the specified location", async () => {
+    ;({ sourceFile, testFile } = await generate(
+      "some/path/to/ArtworkBrickMetadata",
+    ))
+    expect(sourceFile).not.toBeNull()
+    expect(testFile).not.toBeNull()
+  })
+
   const describeTestFile = ({
     namedImport,
     extraTests,
@@ -105,6 +113,15 @@ describe("component generator", () => {
     extraTests: () => void
   }) => {
     describe("concerning the corresponding test file", () => {
+      it("imports react", () => {
+        expect(
+          testFile
+            .getImportDeclarationOrThrow("react")
+            .getDefaultImportOrThrow()
+            .getText(),
+        ).toEqual("React")
+      })
+
       it("imports from the implementation file", () => {
         expect(
           testFile
@@ -120,6 +137,23 @@ describe("component generator", () => {
         expect(
           (desc.getArguments()[0] as StringLiteral).getLiteralText(),
         ).toEqual("ArtworkBrickMetadata")
+      })
+
+      it("tests that the component renders anything", () => {
+        expect(
+          dedent(
+            ((testBodySyntaxList().getLastChildOrThrow() as ExpressionStatement).getExpression() as CallExpression).getText(),
+          ),
+        ).toEqual(
+          dedent(`
+            expect(
+              wrapper
+                .find("ArtworkBrickMetadata")
+                .children()
+                .getElements().length
+            ).not.toEqual(0)
+        `),
+        )
       })
 
       extraTests()

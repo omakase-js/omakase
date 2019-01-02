@@ -1,10 +1,12 @@
 import { mount } from "enzyme"
+import React from "react"
 <% if (relayContainerName) { -%>
 import { graphql } from "react-relay"
-
+import { MockBoot, renderRelayTree } from "DevTools"
 import { <%= relayContainerName %> as <%= componentName %> } from "../<%= componentName %>"
-<% } else { -%>
 
+jest.unmock("react-relay")
+<% } else { -%>
 import { <%= componentName %> } from "../<%= componentName %>"
 <% } -%>
 
@@ -28,6 +30,11 @@ describe("<%= componentName %>", () => {
 <% } else { -%>
     const wrapper = mount(<<%= componentName %> />)
 <% } -%>
-    expect(wrapper.getElement()).not.toEqual(null)
+    expect(
+      wrapper
+        .find("<%= componentName %>")
+        .children()
+        .getElements().length
+    ).not.toEqual(0)
   })
 })

@@ -3,6 +3,8 @@ import * as yeoman from "yeoman-environment"
 import ComponentGenerator = require("../generator")
 
 export default class Generate extends Command {
+  static aliases = ["g"]
+
   static description = "Template for your React/Relay component"
 
   static examples = [
@@ -10,6 +12,7 @@ export default class Generate extends Command {
     `$ om generate MyComponent --classBased`,
     `$ om generate MyComponent --fragmentContainer Artist`,
     `$ om generate MyComponent --paginationContainer Artist.artworks`,
+    `$ om g MyComponent -f Artist`,
   ]
 
   static flags = {

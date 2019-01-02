@@ -30,6 +30,8 @@ jobs:
       - checkout
       - run: yarn install --frozen-lockfile
       - run: 'echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc'
+      - run: "git remote rm origin; git remote add origin https://${GH_TOKEN}@github.com/omakase-js/omakase.git"
+      - run: git pull origin master
       - run: yarn release
 
 workflows:

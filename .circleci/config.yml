@@ -27,13 +27,13 @@ jobs:
           name: Build
           command: yarn build
 
-      - run: # run tests
+      - run:
           name: Test
           command: yarn jest
 
   deploy:
-    machine:
-      enabled: true
+    docker:
+      - image: circleci/node
     steps:
       - checkout
       - run:
@@ -45,5 +45,21 @@ jobs:
           command: 'echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc'
 
       - run:
+          name: WHOAMI
+          command: npm whoami
+
+      - run:
           name: Deploy
           command: yarn release
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master

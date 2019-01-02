@@ -1,13 +1,18 @@
 language: node_js
 node_js: node
-
 cache:
   yarn: true
   directories:
     - node_modules
-    - .jest
+    - ".jest"
 
 script:
   - yarn lint
   - yarn build
   - yarn jest
+
+deploy:
+  provider: npm
+  email: orta.therox+oma@gmail.com
+  api_key:
+    secure: afyvgq88mmK3qaYWjegz1W03tXhV71zaM/jKJueiPTI1fdT+DzqMGWxSKz4MlATMw2ikb48ivCObD/SkXbw/yXKdem63DLoDNL3XK0oVig3FoG/81sfZke0YUDYYB6lyKO7DAn9CkOMZr0HH3M/lrUCvuN52smzQafdqlKCyPO6MhNaP1v8mg6o9yO/Gomjn+bPUNg3r3l2k1UIRzj5sNpvkUJFYjUvYrRgNeZUgeGFBGeIlIjZ02bKMA9ACoXeMsuTpTnh9CmBiAP/cDHGYeYhpZhONxPUxy39jMm1qOTjUJoKpQCXWdZtXF639HB7GUEUPz1olBCkxKbeSFv2lieCUeO/uInSvL6Cke1kgtNpg5pgBLYIS1JcY1VqvgSgEaI0mrRvKgGoPfXMwRMn4JBeqBMVhrylqD3bWGknE8FeMjsv58jgDbomYasC64Q6U7oP1L0v8QliYZFoSi0pBxahqg8mlm7Rabhdj37n9qBpir2n7kPnJRHN8BLSLnLFcMjgPSXaF3mnc6ZKTsLnQOqW44AzwykDyY4s7OK0GbFnQpxqp1OVZ/EfQKILo/khg1SEfn+q3jF9jDb4uQKUPI2AaQf7wtkI5xCDaqEc5dUnF6/BXqa9rartu1SvlEzM17Hj3Soc6lYF6d9TjCepEPyR09xDk2+cuWbn+zXz3JbQ=

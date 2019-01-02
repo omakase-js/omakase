@@ -41,5 +41,8 @@
     "dedent": "^0.7.0",
     "ts-simple-ast": "^20.0.0",
     "yeoman-test": "^1.9.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

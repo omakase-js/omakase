@@ -45,10 +45,6 @@ jobs:
           command: 'echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc'
 
       - run:
-          name: WHOAMI
-          command: npm whoami
-
-      - run:
           name: Deploy
           command: yarn release
 

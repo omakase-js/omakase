@@ -7,11 +7,21 @@
   "scripts": {
     "build": "lerna run build",
     "lint": "lerna run lint",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "release": "auto shipit"
+  },
+  "author": {
+    "name": "Omakase JS",
+    "email": "orta.therox+oma@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omakase-js/omakase/"
   },
   "devDependencies": {
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.0",
+    "auto-release-cli": "^0.37.1",
     "danger": "^6.0.2",
     "husky": "^1.0.0",
     "jest": "^23.6.0",

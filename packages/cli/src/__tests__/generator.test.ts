@@ -19,6 +19,7 @@ import {
   VariableStatement,
 } from "ts-simple-ast"
 import { run as runGenerator } from "yeoman-test"
+import ComponentGenerator = require("../generator")
 
 function compileGenerator() {
   try {
@@ -57,9 +58,11 @@ function generate(component: string, options = {}) {
       throw error
     }
     const project = new Project({})
-    const sourceFile = project.addExistingSourceFile(`${component}.tsx`)
+    const sourceFile = project.addExistingSourceFile(
+      ComponentGenerator.sourceFilePath(component),
+    )
     const testFile = project.addExistingSourceFile(
-      `__tests__/${component}.test.tsx`,
+      ComponentGenerator.testFilePath(component),
     )
     return { sourceFile, testFile }
   })

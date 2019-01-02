@@ -2,6 +2,17 @@ import * as path from "path"
 import * as Generator from "yeoman-generator"
 
 class ComponentGenerator extends Generator {
+  static sourceFilePath(component: string) {
+    return `${component}.tsx`
+  }
+
+  static testFilePath(component: string) {
+    return path.join(
+      path.dirname(component),
+      `__tests__/${path.basename(component)}.test.tsx`,
+    )
+  }
+
   constructor(args: any, opts: any) {
     super(args, opts)
 
@@ -32,10 +43,15 @@ class ComponentGenerator extends Generator {
       fragmentContainer,
       refetchContainer,
       paginationContainer,
-    } = this.options
+    } = this.options as {
+      component: string
+      classBased: boolean
+      fragmentContainer?: string
+      refetchContainer?: string
+      paginationContainer?: string
+    }
 
-    // TODO: Handle case where Component is a path
-    const componentName = component
+    const componentName = path.basename(component)
 
     const graphqlTypeName =
       fragmentContainer ||
@@ -67,7 +83,7 @@ class ComponentGenerator extends Generator {
 
     this.fs.copyTpl(
       this.templatePath("Component.tsx.ejs"),
-      this.destinationPath(componentName + ".tsx"),
+      this.destinationPath(ComponentGenerator.sourceFilePath(component)),
       {
         componentName,
         classBased,
@@ -81,7 +97,7 @@ class ComponentGenerator extends Generator {
     )
     this.fs.copyTpl(
       this.templatePath("Component.test.tsx.ejs"),
-      this.destinationPath(`__tests__/${componentName}.test.tsx`),
+      this.destinationPath(ComponentGenerator.testFilePath(component)),
       {
         componentName,
         relayContainerName,

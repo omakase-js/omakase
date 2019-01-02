@@ -4,11 +4,10 @@ node_js: node
 cache:
   yarn: true
   directories:
-  - node_modules
-  - .jest
+    - node_modules
+    - .jest
 
 script:
-- yarn lint
-- yarn build
-- ls packages/cli/src/commands/_tests
-- yarn jest
+  - yarn lint
+  - yarn build
+  - yarn jest

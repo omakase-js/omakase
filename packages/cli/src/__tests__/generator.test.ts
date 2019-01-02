@@ -4,6 +4,7 @@ import * as fs from "fs"
 import * as path from "path"
 import {
   ArrowFunction,
+  AwaitExpression,
   BodyableNodeStructure,
   CallExpression,
   ExpressionStatement,
@@ -14,9 +15,9 @@ import {
   PropertyAssignment,
   SourceFile,
   StringLiteral,
+  SyntaxList,
   VariableStatement,
 } from "ts-simple-ast"
-import * as ts from "typescript"
 import { run as runGenerator } from "yeoman-test"
 
 function compileGenerator() {
@@ -69,6 +70,21 @@ describe("component generator", () => {
   let sourceFile: SourceFile
   let testFile: SourceFile
 
+  const describeExpression = () =>
+    (testFile
+      .getFirstChildOrThrow()
+      .getLastChildOrThrow() as ExpressionStatement).getExpression() as CallExpression
+
+  const testBodySyntaxList = () => {
+    const itExpression = ((describeExpression().getArguments()[1] as ArrowFunction)
+      .getBody()
+      .getChildSyntaxListOrThrow()
+      .getFirstChildOrThrow() as ExpressionStatement).getExpression() as CallExpression
+    return (itExpression.getArguments()[1] as ArrowFunction)
+      .getBody()
+      .getChildSyntaxListOrThrow()
+  }
+
   beforeAll(() => {
     compiledGenerator = compileGenerator()
     expect.hasAssertions()
@@ -78,9 +94,56 @@ describe("component generator", () => {
     fs.unlinkSync(compiledGenerator)
   })
 
+  const sharedTestTests = ({
+    namedImport,
+    extraTests,
+  }: {
+    namedImport: string
+    extraTests: () => void
+  }) => {
+    describe("concerning the corresponding test file", () => {
+      it("imports the implementation file", () => {
+        expect(
+          testFile
+            .getImportDeclarationOrThrow("../ArtworkBrickMetadata")
+            .getNamedImports()
+            .map(ni => ni.getText()),
+        ).toEqual([namedImport])
+      })
+
+      it("is named after the component", () => {
+        const desc = describeExpression()
+        expect(desc.getExpression().getText()).toEqual("describe")
+        expect(
+          (desc.getArguments()[0] as StringLiteral).getLiteralText(),
+        ).toEqual("ArtworkBrickMetadata")
+      })
+
+      extraTests()
+    })
+  }
+
   describe("concerning purely a React component", () => {
     beforeAll(async () => {
       ;({ sourceFile, testFile } = await generate("ArtworkBrickMetadata"))
+    })
+
+    sharedTestTests({
+      namedImport: "ArtworkBrickMetadata",
+      extraTests: () => {
+        it("has a failing example test", () => {
+          const mountExpression = (testBodySyntaxList().getFirstChildOrThrow() as VariableStatement)
+            .getDeclarations()[0]
+            .getInitializerOrThrow() as CallExpression
+
+          expect(mountExpression.getExpression().getText()).toEqual("mount")
+          expect(
+            (mountExpression.getArguments()[0] as JsxSelfClosingElement)
+              .getTagNameNode()
+              .getText(),
+          ).toEqual("ArtworkBrickMetadata")
+        })
+      },
     })
 
     it("imports only react", () => {
@@ -122,59 +185,67 @@ describe("component generator", () => {
         "React.Component<ArtworkBrickMetadataProps>",
       )
     })
-
-    describe("concerning the corresponding test file", () => {
-      let describeExpression: CallExpression
-
-      beforeAll(() => {
-        describeExpression = (testFile
-          .getFirstChildOrThrow()
-          .getLastChildOrThrow() as ExpressionStatement).getExpression() as CallExpression
-      })
-
-      it("imports the implementation file", () => {
-        expect(
-          testFile
-            .getImportDeclarationOrThrow("../ArtworkBrickMetadata")
-            .getNamedImports()
-            .map(ni => ni.getText()),
-        ).toEqual(["ArtworkBrickMetadata"])
-      })
-
-      it("is named after the component", () => {
-        expect(describeExpression.getExpression().getText()).toEqual("describe")
-        expect(
-          (describeExpression.getArguments()[0] as StringLiteral).getLiteralText(),
-        ).toEqual("ArtworkBrickMetadata")
-      })
-
-      it("has a failing example test", () => {
-        const itExpression = ((describeExpression.getArguments()[1] as ArrowFunction)
-          .getBody()
-          .getChildSyntaxListOrThrow()
-          .getFirstChildOrThrow() as ExpressionStatement).getExpression() as CallExpression
-        const mountExpression = ((itExpression.getArguments()[1] as ArrowFunction)
-          .getBody()
-          .getChildSyntaxListOrThrow()
-          .getFirstChildOrThrow() as VariableStatement)
-          .getDeclarations()[0]
-          .getInitializerOrThrow() as CallExpression
-
-        expect(mountExpression.getExpression().getText()).toEqual("mount")
-        expect(
-          (mountExpression.getArguments()[0] as JsxSelfClosingElement)
-            .getTagNameNode()
-            .getText(),
-        ).toEqual("ArtworkBrickMetadata")
-      })
-    })
   })
 
   describe("concerning Relay", () => {
-    const sharedTests = (
-      containerType: string,
-      containerTest: (callExpression: CallExpression) => void,
-    ) => {
+    const containerDeclaration = (containerType: string) =>
+      sourceFile.getVariableDeclarationOrThrow(
+        "ArtworkBrickMetadata" + containerType,
+      )
+
+    const createContainerCallExpression = (containerType: string) =>
+      containerDeclaration(
+        containerType,
+      ).getLastChildOrThrow() as CallExpression
+
+    const sharedRelayTests = (containerType: string) => {
+      sharedTestTests({
+        namedImport: `ArtworkBrickMetadata${containerType} as ArtworkBrickMetadata`,
+        extraTests: () => {
+          it("imports react-relay", () => {
+            expect(
+              testFile
+                .getImportDeclarationOrThrow("react-relay")
+                .getNamedImports()
+                .map(ni => ni.getText()),
+            ).toEqual(["graphql"])
+          })
+
+          it("has a failing example test", () => {
+            const mountExpression = ((testBodySyntaxList().getFirstChildOrThrow() as VariableStatement)
+              .getDeclarations()[0]
+              .getInitializerOrThrow() as AwaitExpression).getExpression() as CallExpression
+
+            expect(mountExpression.getExpression().getText()).toEqual(
+              "renderRelayTree",
+            )
+
+            const config = mountExpression.getArguments()[0] as ObjectLiteralExpression
+            expect(
+              (config.getPropertyOrThrow("Component") as PropertyAssignment)
+                .getInitializerOrThrow()
+                .getText(),
+            ).toEqual("ArtworkBrickMetadata")
+            expect(
+              dedent(
+                (config.getPropertyOrThrow("query") as PropertyAssignment)
+                  .getInitializerOrThrow()
+                  .getText(),
+              ),
+            ).toEqual(
+              dedent(
+                `graphql\`
+                # TODO: Add parameters or nest the fragment spread inside a root field, as necessary.
+                query ArtworkBrickMetadata_Test_Query {
+                  ...ArtworkBrickMetadata_artwork
+                }
+              \``,
+              ),
+            )
+          })
+        },
+      })
+
       it("imports react-relay", () => {
         expect(
           sourceFile
@@ -208,28 +279,28 @@ describe("component generator", () => {
       })
 
       it("exports the container", () => {
-        const containerDeclaration = sourceFile.getVariableDeclarationOrThrow(
-          "ArtworkBrickMetadata" + containerType,
-        )
         expect(
-          sourceFile.getExportedDeclarations().includes(containerDeclaration),
+          sourceFile
+            .getExportedDeclarations()
+            .includes(containerDeclaration(containerType)),
         ).toBeTruthy()
-        const createContainerCallExpression = containerDeclaration.getLastChildOrThrow() as CallExpression
-        const args = createContainerCallExpression.getArguments()
-        expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
-        containerTest(createContainerCallExpression)
       })
     }
 
     describe("fragment containers", () => {
       beforeAll(async () => {
-        ;({ sourceFile } = await generate("ArtworkBrickMetadata", {
+        ;({ sourceFile, testFile } = await generate("ArtworkBrickMetadata", {
           fragmentContainer: "Artwork",
         }))
       })
 
-      sharedTests("FragmentContainer", createContainerCallExpression => {
-        const args = createContainerCallExpression.getArguments()
+      sharedRelayTests("FragmentContainer")
+
+      it("has the correct configuration", () => {
+        const args = createContainerCallExpression(
+          "FragmentContainer",
+        ).getArguments()
+        expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
         expect(dedent(args[1].getText())).toEqual(
           dedent(
             `graphql\`
@@ -243,13 +314,18 @@ describe("component generator", () => {
 
     describe("refetch containers", () => {
       beforeAll(async () => {
-        ;({ sourceFile } = await generate("ArtworkBrickMetadata", {
+        ;({ sourceFile, testFile } = await generate("ArtworkBrickMetadata", {
           refetchContainer: "Artwork",
         }))
       })
 
-      sharedTests("RefetchContainer", createContainerCallExpression => {
-        const args = createContainerCallExpression.getArguments()
+      sharedRelayTests("RefetchContainer")
+
+      it("has the correct configuration", () => {
+        const args = createContainerCallExpression(
+          "RefetchContainer",
+        ).getArguments()
+        expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
         expect(dedent(args[1].getText())).toEqual(
           dedent(
             `graphql\`
@@ -278,7 +354,7 @@ describe("component generator", () => {
 
     describe("pagination containers", () => {
       beforeAll(async () => {
-        ;({ sourceFile } = await generate("ArtworkBrickMetadata", {
+        ;({ sourceFile, testFile } = await generate("ArtworkBrickMetadata", {
           paginationContainer: "Artwork.relatedArtworks",
         }))
       })
@@ -293,8 +369,13 @@ describe("component generator", () => {
         }
       })
 
-      sharedTests("PaginationContainer", createContainerCallExpression => {
-        const args = createContainerCallExpression.getArguments()
+      sharedRelayTests("PaginationContainer")
+
+      it("has the correct configuration", () => {
+        const args = createContainerCallExpression(
+          "PaginationContainer",
+        ).getArguments()
+        expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
         expect(dedent(args[1].getText())).toEqual(
           dedent(
             `graphql\`

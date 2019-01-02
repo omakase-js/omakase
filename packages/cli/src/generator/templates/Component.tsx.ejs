@@ -23,7 +23,7 @@ export const <%= ComponentName %>: React.SFC<<%= ComponentName %>Props> = props 
 <% } -%>
 
 <% if (GraphQLTypeName) { -%>
-export const <%= ComponentName %><%= relayContainerType %> = create<%= relayContainerType %>(
+export const <%= containerName %> = create<%= relayContainerType %>(
   <%= ComponentName %>,
   graphql`
     fragment <%= relayTypeName %> on <%= GraphQLTypeName %><%- paginationContainer ? " @argumentDefinitions(count: { type: \"Int\", defaultValue: 10 }, cursor: { type: \"String\", defaultValue: \"\" })" : "" %> {

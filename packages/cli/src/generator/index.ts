@@ -46,12 +46,15 @@ class ComponentGenerator extends Generator {
       GraphQLTypeName &&
       GraphQLTypeName[0].toLowerCase() + GraphQLTypeName.substr(1)
     const relayTypeName = relayPropName && ComponentName + "_" + relayPropName
-    const relayContainerType =
-      GraphQLTypeName && fragmentContainer
+    const relayContainerType = !GraphQLTypeName
+      ? null
+      : fragmentContainer
         ? "FragmentContainer"
         : refetchContainer
           ? "RefetchContainer"
           : "PaginationContainer"
+    const containerName =
+      relayContainerType && ComponentName + relayContainerType
 
     // FIXME: For some unknown reason the sourceRoot is wrong when run from the CLI
     this.sourceRoot(path.join(__dirname, "templates"))
@@ -61,6 +64,7 @@ class ComponentGenerator extends Generator {
       this.destinationPath(Component + ".tsx"),
       {
         ComponentName,
+        containerName,
         classBased,
         GraphQLTypeName,
         relayContainerType,
@@ -77,6 +81,9 @@ class ComponentGenerator extends Generator {
       this.destinationPath(`__tests__/${Component}.test.tsx`),
       {
         ComponentName,
+        containerName,
+        relayContainerType,
+        relayTypeName,
       },
     )
   }

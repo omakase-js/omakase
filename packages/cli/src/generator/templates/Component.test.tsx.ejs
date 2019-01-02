@@ -1,9 +1,33 @@
-import { <%= ComponentName %> } from "../<%= ComponentName %>"
 import { mount } from "enzyme"
+<% if (containerName) { -%>
+import { graphql } from "react-relay"
+
+import { <%= containerName %> as <%= ComponentName %> } from "../<%= ComponentName %>"
+<% } else { -%>
+
+import { <%= ComponentName %> } from "../<%= ComponentName %>"
+<% } -%>
 
 describe("<%= ComponentName %>", () => {
-  it("renders", () => {
+  it("renders", <%= containerName && "async " %>() => {
+<% if (containerName) { -%>
+    const wrapper = await renderRelayTree({
+      Component: <%= ComponentName %>,
+      query: graphql`
+        # TODO: Add parameters or nest the fragment spread inside a root field, as necessary.
+        query <%= ComponentName %>_Test_Query {
+          ...<%= relayTypeName %>
+        }
+      `,
+      mockResolvers: {},
+      variables: {},
+      wrapper: children => (
+        <MockBoot breakpoint="lg">{children}</MockBoot>
+      ),
+    })
+<% } else { -%>
     const wrapper = mount(<<%= ComponentName %> />)
+<% } -%>
     expect(wrapper.getElement()).not.toEqual(null)
   })
 })

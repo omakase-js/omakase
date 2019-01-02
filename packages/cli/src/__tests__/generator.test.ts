@@ -94,7 +94,7 @@ describe("component generator", () => {
     fs.unlinkSync(compiledGenerator)
   })
 
-  const sharedTestTests = ({
+  const describeTestFile = ({
     namedImport,
     extraTests,
   }: {
@@ -102,7 +102,7 @@ describe("component generator", () => {
     extraTests: () => void
   }) => {
     describe("concerning the corresponding test file", () => {
-      it("imports the implementation file", () => {
+      it("imports from the implementation file", () => {
         expect(
           testFile
             .getImportDeclarationOrThrow("../ArtworkBrickMetadata")
@@ -128,7 +128,7 @@ describe("component generator", () => {
       ;({ sourceFile, testFile } = await generate("ArtworkBrickMetadata"))
     })
 
-    sharedTestTests({
+    describeTestFile({
       namedImport: "ArtworkBrickMetadata",
       extraTests: () => {
         it("has a failing example test", () => {
@@ -198,8 +198,8 @@ describe("component generator", () => {
         containerType,
       ).getLastChildOrThrow() as CallExpression
 
-    const sharedRelayTests = (containerType: string) => {
-      sharedTestTests({
+    const describeContainerType = (containerType: string) => {
+      describeTestFile({
         namedImport: `ArtworkBrickMetadata${containerType} as ArtworkBrickMetadata`,
         extraTests: () => {
           it("imports react-relay", () => {
@@ -294,7 +294,7 @@ describe("component generator", () => {
         }))
       })
 
-      sharedRelayTests("FragmentContainer")
+      describeContainerType("FragmentContainer")
 
       it("has the correct configuration", () => {
         const args = createContainerCallExpression(
@@ -319,7 +319,7 @@ describe("component generator", () => {
         }))
       })
 
-      sharedRelayTests("RefetchContainer")
+      describeContainerType("RefetchContainer")
 
       it("has the correct configuration", () => {
         const args = createContainerCallExpression(
@@ -369,7 +369,7 @@ describe("component generator", () => {
         }
       })
 
-      sharedRelayTests("PaginationContainer")
+      describeContainerType("PaginationContainer")
 
       it("has the correct configuration", () => {
         const args = createContainerCallExpression(

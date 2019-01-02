@@ -5,7 +5,7 @@ class ComponentGenerator extends Generator {
   constructor(args: any, opts: any) {
     super(args, opts)
 
-    this.argument("Component", { type: String, required: true })
+    this.argument("component", { type: String, required: true })
     this.option("classBased", { type: Boolean, default: false })
     this.option("fragmentContainer", { type: String })
     this.option("refetchContainer", { type: String })
@@ -27,7 +27,7 @@ class ComponentGenerator extends Generator {
 
   writing() {
     const {
-      Component,
+      component,
       classBased,
       fragmentContainer,
       refetchContainer,
@@ -35,53 +35,56 @@ class ComponentGenerator extends Generator {
     } = this.options
 
     // TODO: Handle case where Component is a path
-    const ComponentName = Component
-    const GraphQLTypeName =
+    const componentName = component
+
+    const graphqlTypeName =
       fragmentContainer ||
       refetchContainer ||
       (paginationContainer && paginationContainer.split(".")[0])
-    const paginationFieldName =
+
+    const relayPaginationFieldName =
       paginationContainer && paginationContainer.split(".")[1]
+
     const relayPropName =
-      GraphQLTypeName &&
-      GraphQLTypeName[0].toLowerCase() + GraphQLTypeName.substr(1)
-    const relayTypeName = relayPropName && ComponentName + "_" + relayPropName
-    const relayContainerType = !GraphQLTypeName
+      graphqlTypeName &&
+      graphqlTypeName[0].toLowerCase() + graphqlTypeName.substr(1)
+
+    const relayTypeName = relayPropName && componentName + "_" + relayPropName
+
+    const relayContainerType = !graphqlTypeName
       ? null
       : fragmentContainer
         ? "FragmentContainer"
         : refetchContainer
           ? "RefetchContainer"
           : "PaginationContainer"
-    const containerName =
-      relayContainerType && ComponentName + relayContainerType
+
+    const relayContainerName =
+      relayContainerType && componentName + relayContainerType
 
     // FIXME: For some unknown reason the sourceRoot is wrong when run from the CLI
     this.sourceRoot(path.join(__dirname, "templates"))
 
     this.fs.copyTpl(
       this.templatePath("Component.tsx.ejs"),
-      this.destinationPath(Component + ".tsx"),
+      this.destinationPath(componentName + ".tsx"),
       {
-        ComponentName,
-        containerName,
+        componentName,
         classBased,
-        GraphQLTypeName,
+        graphqlTypeName,
+        relayContainerName,
         relayContainerType,
         relayPropName,
         relayTypeName,
-        fragmentContainer,
-        refetchContainer,
-        paginationContainer,
-        paginationFieldName,
+        relayPaginationFieldName,
       },
     )
     this.fs.copyTpl(
       this.templatePath("Component.test.tsx.ejs"),
-      this.destinationPath(`__tests__/${Component}.test.tsx`),
+      this.destinationPath(`__tests__/${componentName}.test.tsx`),
       {
-        ComponentName,
-        containerName,
+        componentName,
+        relayContainerName,
         relayContainerType,
         relayTypeName,
       },

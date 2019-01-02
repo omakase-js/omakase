@@ -1,21 +1,21 @@
 import { mount } from "enzyme"
-<% if (containerName) { -%>
+<% if (relayContainerName) { -%>
 import { graphql } from "react-relay"
 
-import { <%= containerName %> as <%= ComponentName %> } from "../<%= ComponentName %>"
+import { <%= relayContainerName %> as <%= componentName %> } from "../<%= componentName %>"
 <% } else { -%>
 
-import { <%= ComponentName %> } from "../<%= ComponentName %>"
+import { <%= componentName %> } from "../<%= componentName %>"
 <% } -%>
 
-describe("<%= ComponentName %>", () => {
-  it("renders", <%= containerName && "async " %>() => {
-<% if (containerName) { -%>
+describe("<%= componentName %>", () => {
+  it("renders", <%= relayContainerName && "async " %>() => {
+<% if (relayContainerName) { -%>
     const wrapper = await renderRelayTree({
-      Component: <%= ComponentName %>,
+      Component: <%= componentName %>,
       query: graphql`
         # TODO: Add parameters or nest the fragment spread inside a root field, as necessary.
-        query <%= ComponentName %>_Test_Query {
+        query <%= componentName %>_Test_Query {
           ...<%= relayTypeName %>
         }
       `,
@@ -26,7 +26,7 @@ describe("<%= ComponentName %>", () => {
       ),
     })
 <% } else { -%>
-    const wrapper = mount(<<%= ComponentName %> />)
+    const wrapper = mount(<<%= componentName %> />)
 <% } -%>
     expect(wrapper.getElement()).not.toEqual(null)
   })

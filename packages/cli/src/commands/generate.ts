@@ -5,7 +5,12 @@ import ComponentGenerator = require("../generator")
 export default class Generate extends Command {
   static description = "Template for your React/Relay component"
 
-  static examples = [`$ om generate MyComponent`]
+  static examples = [
+    `$ om generate path/to/MyComponent`,
+    `$ om generate MyComponent --classBased`,
+    `$ om generate MyComponent --fragmentContainer Artist`,
+    `$ om generate MyComponent --paginationContainer Artist.artworks`,
+  ]
 
   static flags = {
     help: f.help({ char: "h" }),

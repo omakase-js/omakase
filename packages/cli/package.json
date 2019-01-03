@@ -10,12 +10,12 @@
   "license": "MIT",
   "scripts": {
     "type-check": "tsc --noEmit",
-    "build": "tsc",
+    "build": "tsc -b && cp -R src/generator/templates build/generator",
     "lint": "tslint 'src/**/*.{ts,tsx}'",
     "release": "release-it",
     "test": "jest",
     "postpack": "rm -f oclif.manifest.json",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme"
+    "prepack": "rm -rf build && yarn build && oclif-dev manifest && oclif-dev readme"
   },
   "oclif": {
     "commands": "./build/commands",

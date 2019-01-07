@@ -14,7 +14,7 @@ This repo is still a WIP. Our aims:
 ## How do I work on this?
 
 ```sh
-git clone https://github.com/artsy/omakase.git
+git clone https://github.com/omakase-js/omakase.git
 cd omakase
 
 yarn install

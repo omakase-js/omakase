@@ -1,3 +1,17 @@
+# 0.0.5 (Mon Jan 07 2019)
+
+#### 🐛  Bug Fix
+
+- [README] Change URL to GH org. [#7](https://github.com/omakase-js/omakase/pull/7) ([@alloy](https://github.com/alloy))
+- `cli`
+  - [package] Include templates in release [#6](https://github.com/omakase-js/omakase/pull/6) ([@alloy](https://github.com/alloy))
+
+#### Authors: 1
+
+- Eloy Durán ([@alloy](https://github.com/alloy))
+
+---
+
 # 0.0.4 (Wed Jan 02 2019)
 
 

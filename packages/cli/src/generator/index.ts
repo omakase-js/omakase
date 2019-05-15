@@ -1,15 +1,23 @@
 import * as path from "path"
 import * as Generator from "yeoman-generator"
 
+function pathWithoutExtname(filename: string) {
+  return path.join(
+    path.dirname(filename),
+    path.basename(filename, path.extname(filename)),
+  )
+}
+
 class ComponentGenerator extends Generator {
   static sourceFilePath(component: string) {
-    return `${component}.tsx`
+    return `${pathWithoutExtname(component)}.tsx`
   }
 
   static testFilePath(component: string) {
+    const filename = pathWithoutExtname(component)
     return path.join(
-      path.dirname(component),
-      `__tests__/${path.basename(component)}.test.tsx`,
+      path.dirname(filename),
+      `__tests__/${path.basename(filename)}.test.tsx`,
     )
   }
 
@@ -51,7 +59,7 @@ class ComponentGenerator extends Generator {
       paginationContainer?: string
     }
 
-    const componentName = path.basename(component)
+    const componentName = path.basename(pathWithoutExtname(component))
 
     const graphqlTypeName =
       fragmentContainer ||

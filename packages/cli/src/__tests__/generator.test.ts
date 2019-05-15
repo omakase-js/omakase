@@ -97,12 +97,27 @@ describe("component generator", () => {
     fs.unlinkSync(compiledGenerator)
   })
 
-  it("generates the component and test at the specified location", async () => {
-    ;({ sourceFile, testFile } = await generate(
-      "some/path/to/ArtworkBrickMetadata",
-    ))
-    expect(sourceFile).not.toBeNull()
-    expect(testFile).not.toBeNull()
+  describe("concerning the specified destination", () => {
+    it("generates the component and test at the specified location", async () => {
+      ;({ sourceFile, testFile } = await generate(
+        "some/path/to/ArtworkBrickMetadata",
+      ))
+      expect(sourceFile).not.toBeNull()
+      expect(testFile).not.toBeNull()
+    })
+
+    it("ignores a specified file extension", () => {
+      expect(
+        ComponentGenerator.sourceFilePath(
+          `some/path/to/ArtworkBrickMetadata.tsx`,
+        ),
+      ).toEqual(`some/path/to/ArtworkBrickMetadata.tsx`)
+      expect(
+        ComponentGenerator.testFilePath(
+          `some/path/to/ArtworkBrickMetadata.tsx`,
+        ),
+      ).toEqual(`some/path/to/__tests__/ArtworkBrickMetadata.test.tsx`)
+    })
   })
 
   const describeTestFile = ({

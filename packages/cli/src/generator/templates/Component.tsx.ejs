@@ -25,26 +25,28 @@ export const <%= componentName %>: React.SFC<<%= componentName %>Props> = props 
 <% if (graphqlTypeName) { -%>
 export const <%= relayContainerName %> = create<%= relayContainerType %>(
   <%= componentName %>,
-  graphql`
-    fragment <%= relayTypeName %> on <%= graphqlTypeName %><%- relayContainerType === "PaginationContainer" ? " @argumentDefinitions(count: { type: \"Int\", defaultValue: 10 }, cursor: { type: \"String\", defaultValue: \"\" })" : "" %> {
+  {
+    <%= relayPropName %>: graphql`
+      fragment <%= relayTypeName %> on <%= graphqlTypeName %><%- relayContainerType === "PaginationContainer" ? " @argumentDefinitions(count: { type: \"Int\", defaultValue: 10 }, cursor: { type: \"String\", defaultValue: \"\" })" : "" %> {
 <% if (relayContainerType === "RefetchContainer" || relayContainerType === "PaginationContainer") { -%>
-      # Most, but not all, types have this field. If needed, replace it with a
-      # different identifier field and be sure to adjust the query below
-      # accordingly. (Also be sure to remove this comment.)
-      __id
+        # Most, but not all, types have this field. If needed, replace it with a
+        # different identifier field and be sure to adjust the query below
+        # accordingly. (Also be sure to remove this comment.)
+        __id
 <% if (relayContainerType === "PaginationContainer") { -%>
-      <%= relayPaginationFieldName %>(first: $count, after: $cursor) @connection(key: "<%= componentName %>_<%= relayPaginationFieldName %>") {
-        pageInfo {
-          hasNextPage
-        }
-        edges {
-          node {
+        <%= relayPaginationFieldName %>(first: $count, after: $cursor) @connection(key: "<%= componentName %>_<%= relayPaginationFieldName %>") {
+          pageInfo {
+            hasNextPage
+          }
+          edges {
+            node {
+            }
           }
         }
-      }
 <% } -%>
-    }
-  `,
+      }
+    `,
+  },
 <% if (relayContainerType === "RefetchContainer") { -%>
   graphql`
     query <%= componentName %>RefetchQuery($nodeID: ID!) {

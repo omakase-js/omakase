@@ -10,12 +10,12 @@ import {
   ExpressionStatement,
   JsxSelfClosingElement,
   MethodDeclaration,
+  Node,
   ObjectLiteralExpression,
   Project,
   PropertyAssignment,
   SourceFile,
   StringLiteral,
-  SyntaxList,
   VariableStatement,
 } from "ts-simple-ast"
 import { run as runGenerator } from "yeoman-test"
@@ -66,6 +66,12 @@ function generate(component: string, options = {}) {
     )
     return { sourceFile, testFile }
   })
+}
+
+function getProperty(object: Node, property: string) {
+  return ((object as ObjectLiteralExpression).getPropertyOrThrow(
+    property,
+  ) as PropertyAssignment).getInitializerOrThrow()
 }
 
 describe("component generator", () => {
@@ -353,10 +359,12 @@ describe("component generator", () => {
           "FragmentContainer",
         ).getArguments()
         expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
-        expect(dedent(args[1].getText())).toEqual(
+
+        const fragment = getProperty(args[1], "artwork")
+        expect(dedent(fragment.getText())).toEqual(
           dedent(
             `graphql\`
-            fragment ArtworkBrickMetadata_artwork on Artwork {
+              fragment ArtworkBrickMetadata_artwork on Artwork {
             }
           \``,
           ),
@@ -378,7 +386,9 @@ describe("component generator", () => {
           "RefetchContainer",
         ).getArguments()
         expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
-        expect(dedent(args[1].getText())).toEqual(
+
+        const fragment = getProperty(args[1], "artwork")
+        expect(dedent(fragment.getText())).toEqual(
           dedent(
             `graphql\`
             fragment ArtworkBrickMetadata_artwork on Artwork {
@@ -390,6 +400,7 @@ describe("component generator", () => {
           \``,
           ),
         )
+
         expect(dedent(args[2].getText())).toEqual(
           dedent(
             `graphql\`
@@ -428,7 +439,9 @@ describe("component generator", () => {
           "PaginationContainer",
         ).getArguments()
         expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
-        expect(dedent(args[1].getText())).toEqual(
+
+        const fragment = getProperty(args[1], "artwork")
+        expect(dedent(fragment.getText())).toEqual(
           dedent(
             `graphql\`
             fragment ArtworkBrickMetadata_artwork on Artwork @argumentDefinitions(count: { type: "Int", defaultValue: 10 }, cursor: { type: "String", defaultValue: "" }) {
@@ -449,6 +462,7 @@ describe("component generator", () => {
           \``,
           ),
         )
+
         const options = args[2] as ObjectLiteralExpression
         expect(
           ((options.getPropertyOrThrow(

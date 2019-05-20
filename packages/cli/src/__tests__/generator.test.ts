@@ -11,11 +11,13 @@ import {
   JsxSelfClosingElement,
   MethodDeclaration,
   Node,
+  NoSubstitutionTemplateLiteral,
   ObjectLiteralExpression,
   Project,
   PropertyAssignment,
   SourceFile,
   StringLiteral,
+  TaggedTemplateExpression,
   VariableStatement,
 } from "ts-simple-ast"
 import { run as runGenerator } from "yeoman-test"
@@ -72,6 +74,16 @@ function getProperty(object: Node, property: string) {
   return ((object as ObjectLiteralExpression).getPropertyOrThrow(
     property,
   ) as PropertyAssignment).getInitializerOrThrow()
+}
+
+function getFragmentProperty(object: Node, property: string) {
+  return getFragmentText(getProperty(object, property))
+}
+
+function getFragmentText(template: Node) {
+  const literalValue = ((template as TaggedTemplateExpression).getTemplate() as NoSubstitutionTemplateLiteral).getLiteralValue()
+  const text = literalValue.substring(1, literalValue.length - 1)
+  return text
 }
 
 describe("component generator", () => {
@@ -360,14 +372,12 @@ describe("component generator", () => {
         ).getArguments()
         expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
 
-        const fragment = getProperty(args[1], "artwork")
-        expect(dedent(fragment.getText())).toEqual(
-          dedent(
-            `graphql\`
-              fragment ArtworkBrickMetadata_artwork on Artwork {
+        const fragment = getFragmentProperty(args[1], "artwork")
+        expect(dedent(fragment)).toEqual(
+          dedent(`
+            fragment ArtworkBrickMetadata_artwork on Artwork {
             }
-          \``,
-          ),
+          `),
         )
       })
     })
@@ -387,30 +397,26 @@ describe("component generator", () => {
         ).getArguments()
         expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
 
-        const fragment = getProperty(args[1], "artwork")
-        expect(dedent(fragment.getText())).toEqual(
-          dedent(
-            `graphql\`
+        const fragment = getFragmentProperty(args[1], "artwork")
+        expect(dedent(fragment)).toEqual(
+          dedent(`
             fragment ArtworkBrickMetadata_artwork on Artwork {
               # Most, but not all, types have this field. If needed, replace it with a
               # different identifier field and be sure to adjust the query below
               # accordingly. (Also be sure to remove this comment.)
               __id
             }
-          \``,
-          ),
+          `),
         )
 
-        expect(dedent(args[2].getText())).toEqual(
-          dedent(
-            `graphql\`
+        expect(dedent(getFragmentText(args[2]))).toEqual(
+          dedent(`
             query ArtworkBrickMetadataRefetchQuery($nodeID: ID!) {
               node(__id: $nodeID) {
                 ...ArtworkBrickMetadata_artwork
               }
             }
-          \``,
-          ),
+          `),
         )
       })
     })
@@ -440,10 +446,9 @@ describe("component generator", () => {
         ).getArguments()
         expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
 
-        const fragment = getProperty(args[1], "artwork")
-        expect(dedent(fragment.getText())).toEqual(
-          dedent(
-            `graphql\`
+        const fragment = getFragmentProperty(args[1], "artwork")
+        expect(dedent(fragment)).toEqual(
+          dedent(`
             fragment ArtworkBrickMetadata_artwork on Artwork @argumentDefinitions(count: { type: "Int", defaultValue: 10 }, cursor: { type: "String", defaultValue: "" }) {
               # Most, but not all, types have this field. If needed, replace it with a
               # different identifier field and be sure to adjust the query below
@@ -459,8 +464,7 @@ describe("component generator", () => {
                 }
               }
             }
-          \``,
-          ),
+          `),
         )
 
         const options = args[2] as ObjectLiteralExpression
@@ -478,15 +482,8 @@ describe("component generator", () => {
         expect(options.getPropertyOrThrow("getVariables").getText()).toMatch(
           "nodeID: props.artwork.__id",
         )
-        expect(
-          dedent(
-            (options.getPropertyOrThrow("query") as PropertyAssignment)
-              .getInitializerOrThrow()
-              .getText(),
-          ),
-        ).toEqual(
-          dedent(
-            `graphql\`
+        expect(dedent(getFragmentProperty(options, "query"))).toEqual(
+          dedent(`
             query ArtworkBrickMetadataPaginationQuery(
               $nodeID: ID!
               $count: Int!
@@ -496,8 +493,7 @@ describe("component generator", () => {
                 ...ArtworkBrickMetadata_artwork @arguments(count: $count, cursor: $cursor)
               }
             }
-          \``,
-          ),
+          `),
         )
       })
     })

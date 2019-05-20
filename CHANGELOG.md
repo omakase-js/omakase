@@ -1,3 +1,16 @@
+# 0.0.7 (Mon May 20 2019)
+
+#### 🐛  Bug Fix
+
+- `cli`
+  - Ensure people can find the repository from NPM [#12](https://github.com/omakase-js/omakase/pull/12) ([@zephraph](https://github.com/zephraph))
+
+#### Authors: 1
+
+- Justin Bennett ([@zephraph](https://github.com/zephraph))
+
+---
+
 # 0.0.6 (Mon May 20 2019)
 
 #### 🐛  Bug Fix

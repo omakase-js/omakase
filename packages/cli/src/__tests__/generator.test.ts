@@ -1,6 +1,7 @@
 import { execFileSync } from "child_process"
 import * as dedent from "dedent"
 import * as fs from "fs"
+import { parse, Source } from "graphql"
 import * as path from "path"
 import {
   ArrowFunction,
@@ -10,12 +11,14 @@ import {
   ExpressionStatement,
   JsxSelfClosingElement,
   MethodDeclaration,
+  Node,
+  NoSubstitutionTemplateLiteral,
   ObjectLiteralExpression,
   Project,
   PropertyAssignment,
   SourceFile,
   StringLiteral,
-  SyntaxList,
+  TaggedTemplateExpression,
   VariableStatement,
 } from "ts-simple-ast"
 import { run as runGenerator } from "yeoman-test"
@@ -68,6 +71,47 @@ function generate(component: string, options = {}) {
   })
 }
 
+function getProperty(object: Node, property: string) {
+  return ((object as ObjectLiteralExpression).getPropertyOrThrow(
+    property,
+  ) as PropertyAssignment).getInitializerOrThrow()
+}
+
+function getFragmentProperty(object: Node, property: string) {
+  return getFragmentText(getProperty(object, property))
+}
+
+// Also as a side-effect validates the GraphQL document by trying to parse it.
+function getFragmentText(template: Node) {
+  const literalValue = ((template as TaggedTemplateExpression).getTemplate() as NoSubstitutionTemplateLiteral).getLiteralValue()
+  const text = literalValue.substring(1, literalValue.length - 1)
+  try {
+    parse(
+      new Source(text, undefined, {
+        line: template.getStartLineNumber(),
+        column: 1,
+      }),
+    )
+  } catch (e) {
+    e.message = `${e.message}\n\nIn:\n\n${formattedSourceFile(template)}`
+    throw e
+  }
+  return text
+}
+
+function formattedSourceFile(node: Node) {
+  const lines = node
+    .getSourceFile()
+    .getText()
+    .split("\n")
+  const gutterSize = lines.length.toString().length
+  return lines
+    .map(
+      (line, i) => `${(i + 1).toString().padStart(gutterSize, " ")}: ${line}`,
+    )
+    .join("\n")
+}
+
 describe("component generator", () => {
   let compiledGenerator: string
   let sourceFile: SourceFile
@@ -97,12 +141,27 @@ describe("component generator", () => {
     fs.unlinkSync(compiledGenerator)
   })
 
-  it("generates the component and test at the specified location", async () => {
-    ;({ sourceFile, testFile } = await generate(
-      "some/path/to/ArtworkBrickMetadata",
-    ))
-    expect(sourceFile).not.toBeNull()
-    expect(testFile).not.toBeNull()
+  describe("concerning the specified destination", () => {
+    it("generates the component and test at the specified location", async () => {
+      ;({ sourceFile, testFile } = await generate(
+        "some/path/to/ArtworkBrickMetadata",
+      ))
+      expect(sourceFile).not.toBeNull()
+      expect(testFile).not.toBeNull()
+    })
+
+    it("ignores a specified file extension", () => {
+      expect(
+        ComponentGenerator.sourceFilePath(
+          `some/path/to/ArtworkBrickMetadata.tsx`,
+        ),
+      ).toEqual(`some/path/to/ArtworkBrickMetadata.tsx`)
+      expect(
+        ComponentGenerator.testFilePath(
+          `some/path/to/ArtworkBrickMetadata.tsx`,
+        ),
+      ).toEqual(`some/path/to/__tests__/ArtworkBrickMetadata.test.tsx`)
+    })
   })
 
   const describeTestFile = ({
@@ -338,13 +397,18 @@ describe("component generator", () => {
           "FragmentContainer",
         ).getArguments()
         expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
-        expect(dedent(args[1].getText())).toEqual(
-          dedent(
-            `graphql\`
+
+        const fragment = getFragmentProperty(args[1], "artwork")
+        expect(dedent(fragment)).toEqual(
+          dedent(`
             fragment ArtworkBrickMetadata_artwork on Artwork {
+              # TODO: Remove this comment.
+              #
+              # Most, but not all, types have this field. Relay will automatically select it, so if you need a unique ID field
+              # for e.g. React 'key' purposes, use this. Otherwise you can safely remove the selection.
+              __id
             }
-          \``,
-          ),
+          `),
         )
       })
     })
@@ -363,28 +427,31 @@ describe("component generator", () => {
           "RefetchContainer",
         ).getArguments()
         expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
-        expect(dedent(args[1].getText())).toEqual(
-          dedent(
-            `graphql\`
+
+        const fragment = getFragmentProperty(args[1], "artwork")
+        expect(dedent(fragment)).toEqual(
+          dedent(`
             fragment ArtworkBrickMetadata_artwork on Artwork {
-              # Most, but not all, types have this field. If needed, replace it with a
-              # different identifier field and be sure to adjust the query below
-              # accordingly. (Also be sure to remove this comment.)
+              # TODO: Remove this comment.
+              #
+              # Most, but not all, types have this field. Relay will automatically select it, so if you need a unique ID field
+              # for e.g. React 'key' purposes, use this. Otherwise you can safely remove the selection.
+              #
+              # In the unlikely case your type does not have this field, replace it with a different identifier field and be
+              # sure to adjust the query below accordingly.
               __id
             }
-          \``,
-          ),
+          `),
         )
-        expect(dedent(args[2].getText())).toEqual(
-          dedent(
-            `graphql\`
+
+        expect(dedent(getFragmentText(args[2]))).toEqual(
+          dedent(`
             query ArtworkBrickMetadataRefetchQuery($nodeID: ID!) {
               node(__id: $nodeID) {
                 ...ArtworkBrickMetadata_artwork
               }
             }
-          \``,
-          ),
+          `),
         )
       })
     })
@@ -413,13 +480,18 @@ describe("component generator", () => {
           "PaginationContainer",
         ).getArguments()
         expect(args[0].getText()).toEqual("ArtworkBrickMetadata")
-        expect(dedent(args[1].getText())).toEqual(
-          dedent(
-            `graphql\`
+
+        const fragment = getFragmentProperty(args[1], "artwork")
+        expect(dedent(fragment)).toEqual(
+          dedent(`
             fragment ArtworkBrickMetadata_artwork on Artwork @argumentDefinitions(count: { type: "Int", defaultValue: 10 }, cursor: { type: "String", defaultValue: "" }) {
-              # Most, but not all, types have this field. If needed, replace it with a
-              # different identifier field and be sure to adjust the query below
-              # accordingly. (Also be sure to remove this comment.)
+              # TODO: Remove this comment.
+              #
+              # Most, but not all, types have this field. Relay will automatically select it, so if you need a unique ID field
+              # for e.g. React 'key' purposes, use this. Otherwise you can safely remove the selection.
+              #
+              # In the unlikely case your type does not have this field, replace it with a different identifier field and be
+              # sure to adjust the query below accordingly.
               __id
               relatedArtworks(first: $count, after: $cursor) @connection(key: "ArtworkBrickMetadata_relatedArtworks") {
                 pageInfo {
@@ -427,13 +499,18 @@ describe("component generator", () => {
                 }
                 edges {
                   node {
+                    # TODO: Remove this comment.
+                    #
+                    # This is where your field selections for the list go. As for this identifier field selection, follow the
+                    # above comment.
+                    __id
                   }
                 }
               }
             }
-          \``,
-          ),
+          `),
         )
+
         const options = args[2] as ObjectLiteralExpression
         expect(
           ((options.getPropertyOrThrow(
@@ -449,15 +526,8 @@ describe("component generator", () => {
         expect(options.getPropertyOrThrow("getVariables").getText()).toMatch(
           "nodeID: props.artwork.__id",
         )
-        expect(
-          dedent(
-            (options.getPropertyOrThrow("query") as PropertyAssignment)
-              .getInitializerOrThrow()
-              .getText(),
-          ),
-        ).toEqual(
-          dedent(
-            `graphql\`
+        expect(dedent(getFragmentProperty(options, "query"))).toEqual(
+          dedent(`
             query ArtworkBrickMetadataPaginationQuery(
               $nodeID: ID!
               $count: Int!
@@ -467,8 +537,7 @@ describe("component generator", () => {
                 ...ArtworkBrickMetadata_artwork @arguments(count: $count, cursor: $cursor)
               }
             }
-          \``,
-          ),
+          `),
         )
       })
     })

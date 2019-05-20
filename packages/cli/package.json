@@ -36,9 +36,11 @@
   "devDependencies": {
     "@oclif/dev-cli": "^1",
     "@types/dedent": "^0.7.0",
+    "@types/graphql": "^14.2.0",
     "@types/yeoman-generator": "^3.0.1",
     "@types/yeoman-test": "^1.7.4",
     "dedent": "^0.7.0",
+    "graphql": "^14.3.0",
     "ts-simple-ast": "^20.0.0",
     "yeoman-test": "^1.9.1"
   },

@@ -1,6 +1,7 @@
 import { execFileSync } from "child_process"
 import * as dedent from "dedent"
 import * as fs from "fs"
+import { parse, Source } from "graphql"
 import * as path from "path"
 import {
   ArrowFunction,
@@ -80,10 +81,35 @@ function getFragmentProperty(object: Node, property: string) {
   return getFragmentText(getProperty(object, property))
 }
 
+// Also as a side-effect validates the GraphQL document by trying to parse it.
 function getFragmentText(template: Node) {
   const literalValue = ((template as TaggedTemplateExpression).getTemplate() as NoSubstitutionTemplateLiteral).getLiteralValue()
   const text = literalValue.substring(1, literalValue.length - 1)
+  try {
+    parse(
+      new Source(text, undefined, {
+        line: template.getStartLineNumber(),
+        column: 1,
+      }),
+    )
+  } catch (e) {
+    e.message = `${e.message}\n\nIn:\n\n${formattedSourceFile(template)}`
+    throw e
+  }
   return text
+}
+
+function formattedSourceFile(node: Node) {
+  const lines = node
+    .getSourceFile()
+    .getText()
+    .split("\n")
+  const gutterSize = lines.length.toString().length
+  return lines
+    .map(
+      (line, i) => `${(i + 1).toString().padStart(gutterSize, " ")}: ${line}`,
+    )
+    .join("\n")
 }
 
 describe("component generator", () => {
@@ -376,6 +402,11 @@ describe("component generator", () => {
         expect(dedent(fragment)).toEqual(
           dedent(`
             fragment ArtworkBrickMetadata_artwork on Artwork {
+              # TODO: Remove this comment.
+              #
+              # Most, but not all, types have this field. Relay will automatically select it, so if you need a unique ID field
+              # for e.g. React 'key' purposes, use this. Otherwise you can safely remove the selection.
+              __id
             }
           `),
         )
@@ -401,9 +432,13 @@ describe("component generator", () => {
         expect(dedent(fragment)).toEqual(
           dedent(`
             fragment ArtworkBrickMetadata_artwork on Artwork {
-              # Most, but not all, types have this field. If needed, replace it with a
-              # different identifier field and be sure to adjust the query below
-              # accordingly. (Also be sure to remove this comment.)
+              # TODO: Remove this comment.
+              #
+              # Most, but not all, types have this field. Relay will automatically select it, so if you need a unique ID field
+              # for e.g. React 'key' purposes, use this. Otherwise you can safely remove the selection.
+              #
+              # In the unlikely case your type does not have this field, replace it with a different identifier field and be
+              # sure to adjust the query below accordingly.
               __id
             }
           `),
@@ -450,9 +485,13 @@ describe("component generator", () => {
         expect(dedent(fragment)).toEqual(
           dedent(`
             fragment ArtworkBrickMetadata_artwork on Artwork @argumentDefinitions(count: { type: "Int", defaultValue: 10 }, cursor: { type: "String", defaultValue: "" }) {
-              # Most, but not all, types have this field. If needed, replace it with a
-              # different identifier field and be sure to adjust the query below
-              # accordingly. (Also be sure to remove this comment.)
+              # TODO: Remove this comment.
+              #
+              # Most, but not all, types have this field. Relay will automatically select it, so if you need a unique ID field
+              # for e.g. React 'key' purposes, use this. Otherwise you can safely remove the selection.
+              #
+              # In the unlikely case your type does not have this field, replace it with a different identifier field and be
+              # sure to adjust the query below accordingly.
               __id
               relatedArtworks(first: $count, after: $cursor) @connection(key: "ArtworkBrickMetadata_relatedArtworks") {
                 pageInfo {
@@ -460,6 +499,11 @@ describe("component generator", () => {
                 }
                 edges {
                   node {
+                    # TODO: Remove this comment.
+                    #
+                    # This is where your field selections for the list go. As for this identifier field selection, follow the
+                    # above comment.
+                    __id
                   }
                 }
               }

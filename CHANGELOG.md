@@ -1,3 +1,16 @@
+# 0.0.6 (Mon May 20 2019)
+
+#### 🐛  Bug Fix
+
+- `cli`
+  - Fix generator bugs [#11](https://github.com/omakase-js/omakase/pull/11) ([@alloy](https://github.com/alloy))
+
+#### Authors: 1
+
+- Eloy Durán ([@alloy](https://github.com/alloy))
+
+---
+
 # 0.0.5 (Mon Jan 07 2019)
 
 #### 🐛  Bug Fix

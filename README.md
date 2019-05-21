@@ -6,7 +6,13 @@ A JS Stack curated by the folks at Artsy.
 
 This repo is still a WIP. Our aims:
 
-- There is an omakase cli tool for template files like a new QueryRenderer etc
+### Done
+
+- There is an [omakase cli tool with a generator](./packages/cli/README.md) for template files like a new React
+  component and test file, and optionally a Relay container.
+
+### TODO
+
 - There is a react-scripts fork
 - The "omakase" is a collection of small modules which combine webpack-y stuff ( see [zeit/next-plugins/](https://github.com/zeit/next-plugins/tree/master/packages) )
 - There is a preset which is basically making sure [this list](https://speakerdeck.com/artsyopensource/the-artsy-omakase-artsy-x-react-native-2018?slide=25) is set up

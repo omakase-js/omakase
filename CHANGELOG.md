@@ -1,3 +1,16 @@
+# 0.0.8 (Tue May 21 2019)
+
+#### 🐛  Bug Fix
+
+- `cli`
+  - Add @oclif/plugin-help as a direct dependency [#13](https://github.com/omakase-js/omakase/pull/13) ([@zephraph](https://github.com/zephraph))
+
+#### Authors: 1
+
+- Justin Bennett ([@zephraph](https://github.com/zephraph))
+
+---
+
 # 0.0.7 (Mon May 20 2019)
 
 #### 🐛  Bug Fix

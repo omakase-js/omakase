@@ -1,6 +1,6 @@
 {
   "name": "@omakase/cli",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "The Omakase JS CLI",
   "repository": {
     "type": "git",

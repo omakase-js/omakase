@@ -1,3 +1,16 @@
+# 0.0.9 (Tue May 21 2019)
+
+#### 🐛  Bug Fix
+
+- `cli`
+  - [docs] Update about generator [#14](https://github.com/omakase-js/omakase/pull/14) ([@alloy](https://github.com/alloy))
+
+#### Authors: 1
+
+- Eloy Durán ([@alloy](https://github.com/alloy))
+
+---
+
 # 0.0.8 (Tue May 21 2019)
 
 #### 🐛  Bug Fix

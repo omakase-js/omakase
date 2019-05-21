@@ -10,7 +10,7 @@
     "om": "./bin/run"
   },
   "main": "build/index.js",
-  "author": "Orta Therox <orta.therox@gmail.com> & Art.sy Inc",
+  "author": "Orta Therox <orta.therox@gmail.com>, Eloy Durán <eloy.de.enige@gmail.com>, and Art.sy Inc",
   "license": "MIT",
   "scripts": {
     "type-check": "tsc --noEmit",

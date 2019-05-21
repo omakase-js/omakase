@@ -60,4 +60,8 @@ typings/
 # next.js build output
 .next
 
+# yarn workspace
+packages/cli/build
+packages/cli/package
+
 packages/cli/src/generator/index.js

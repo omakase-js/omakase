@@ -125,7 +125,7 @@ describe("ArtworkMetadata", () => {
       Component: ArtworkMetadata,
       query: graphql`
         # TODO: Add parameters or nest the fragment spread inside a root field, as necessary.
-        query ArtworkMetadata_Test_Query {
+        query ArtworkMetadataTestQuery {
           ...ArtworkMetadata_artwork
         }
       `,
@@ -205,7 +205,7 @@ describe("ArtworkMetadata", () => {
       Component: ArtworkMetadata,
       query: graphql`
         # TODO: Add parameters or nest the fragment spread inside a root field, as necessary.
-        query ArtworkMetadata_Test_Query {
+        query ArtworkMetadataTestQuery {
           ...ArtworkMetadata_artwork
         }
       `,
@@ -330,7 +330,7 @@ describe("ArtworkMetadata", () => {
       Component: ArtworkMetadata,
       query: graphql`
         # TODO: Add parameters or nest the fragment spread inside a root field, as necessary.
-        query ArtworkMetadata_Test_Query {
+        query ArtworkMetadataTestQuery {
           ...ArtworkMetadata_artwork
         }
       `,

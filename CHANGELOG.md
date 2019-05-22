@@ -1,3 +1,17 @@
+# 0.0.10 (Wed May 22 2019)
+
+#### 🐛  Bug Fix
+
+- `cli`
+  - Fix broken tests [#18](https://github.com/omakase-js/omakase/pull/18) ([@ashkan18](https://github.com/ashkan18))
+  - Fix test query name used by removing _ [#17](https://github.com/omakase-js/omakase/pull/17) ([@ashkan18](https://github.com/ashkan18))
+
+#### Authors: 1
+
+- Ashkan Nasseri ([@ashkan18](https://github.com/ashkan18))
+
+---
+
 # 0.0.9 (Tue May 21 2019)
 
 #### 🐛  Bug Fix

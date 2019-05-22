@@ -332,7 +332,7 @@ describe("component generator", () => {
               dedent(
                 `graphql\`
                 # TODO: Add parameters or nest the fragment spread inside a root field, as necessary.
-                query ArtworkBrickMetadata_Test_Query {
+                query ArtworkBrickMetadataTestQuery {
                   ...ArtworkBrickMetadata_artwork
                 }
               \``,

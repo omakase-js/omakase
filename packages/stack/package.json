@@ -1,12 +1,11 @@
 {
-  "name": "@omakase/scripts",
+  "name": "@omakase/stack",
   "version": "0.0.1",
-  "description": "A collection of dependencies commonly used across projects",
-  "repository": "https://github.com/omakase-js/omakase/tree/master/packages/scripts",
+  "description": "A collection of dependencies commonly used across Artsy projects",
+  "repository": "https://github.com/omakase-js/omakase/tree/master/packages/stack",
   "author": "Artsy Inc.",
   "license": "MIT",
   "dependencies": {
-    "@artsy/auto-config": "^1.0.0",
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
@@ -18,7 +17,6 @@
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
     "@omakase/cli": "^0.0.10",
-    "@sentry/browser": "^5.3.0",
     "babel-jest": "^24.8.0",
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-module-resolver": "^3.2.0",

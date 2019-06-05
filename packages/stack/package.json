@@ -20,6 +20,7 @@
     "babel-jest": "^24.8.0",
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-module-resolver": "^3.2.0",
+    "babel-plugin-relay": "^4.0.0",
     "babel-plugin-styled-components": "^1.10.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.13.1",
@@ -27,16 +28,23 @@
     "jest": "^24.8.0",
     "jest-junit": "^6.4.0",
     "jest-raw-loader": "^1.0.1",
-    "jest-styled-components": "^6.3.1",
     "lint-staged": "^8.1.7",
     "patch-package": "^6.1.2",
     "postinstall-prepare": "^1.0.1",
     "prettier": "^1.17.1",
+    "relay-compiler": "^4.0.0",
+    "relay-compiler-language-typescript": "^4.3.0",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-relay": "^0.0.3",
     "tslint-react": "^4.0.0",
     "typescript": "^3.4.5",
     "typescript-styled-plugin": "^0.14.0"
+  },
+  "devDependencies": {
+    "graphql": "^14.3.1",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "styled-components": "^4.3.0"
   }
 }

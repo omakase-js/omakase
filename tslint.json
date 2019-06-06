@@ -4,10 +4,12 @@
     "tslint-config-prettier"
   ],
   "rules": {
+    "class-name": false,
     "interface-name": [
       true,
       "never-prefix"
     ],
+    "max-classes-per-file": false,
     "member-access": [
       false,
       "check-accessor",

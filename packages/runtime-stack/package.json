@@ -1,0 +1,20 @@
+{
+  "name": "@omakase/runtime-stack",
+  "version": "0.0.1",
+  "description": "A collection of dependencies commonly used across Artsy projects",
+  "repository": "https://github.com/omakase-js/omakase/tree/master/packages/dev-stack",
+  "author": "Artsy Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "@artsy/palette": "^4.14.7",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-relay": "^4.0.0",
+    "styled-components": "^4.3.1",
+    "styled-system": "^5.0.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "prop-types": "^15.7.2"
+  }
+}

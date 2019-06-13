@@ -11,10 +11,7 @@
     "test": "lerna run test",
     "release": "auto shipit"
   },
-  "author": {
-    "name": "Omakase JS",
-    "email": "orta.therox+oma@gmail.com"
-  },
+  "author": "Art.sy Inc <it@artsymail.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/omakase-js/omakase.git"
